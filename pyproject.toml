@@ -1,0 +1,31 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "unicirc"
+version = "0.1"
+authors = [
+  { name="Korbinian Kottmann" },
+  { name="David Wierichs" },
+  { name="Nathan Killoran" }
+]
+description = "Finding and compiling optimal brick wall circuits for classical Lie groups."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pennylane",
+    "jax==0.6.0",
+    "optax",
+    "jax_tqdm",
+    "tqdm",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
