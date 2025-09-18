@@ -16,6 +16,7 @@ The repository is structured as follows:
 - `scripts/` contains Jupyter notebooks and Python scripts to run numerical tests,
   execute variational workflows, and plot results
 - `tests/` contains tests for the `unicirc` package
+- `test_data/` collects data for test runs of the Python scripts that generate data
 - `unicirc/` contains the source code for the Python package `unicirc`
 
 
