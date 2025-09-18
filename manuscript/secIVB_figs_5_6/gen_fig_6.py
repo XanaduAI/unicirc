@@ -96,4 +96,4 @@ for axs, n, n_epochs_, n_targets_ in zip(axss, ns, n_epochs, n_targets):
             ax.set_xticks(x_ticks_first_panel[n])
             ax.set_ylabel(f"$\\mathcal{{L}}(\\theta)$")
             ax.text(1.5, tol**(1/2), f"${n=}$")
-plt.savefig(f"../figures/chained_compilation_cost_{group}.pdf", dpi=300, bbox_inches='tight')
+plt.savefig(f"fig_6_chained_compilation_cost_{group}.pdf", dpi=300, bbox_inches='tight')

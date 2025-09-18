@@ -69,5 +69,5 @@ for name in ["wall", "cpu"]:
     ax.set_ylabel("Density")
     ax.set_xticks(np.log10(xticks));
     ax.set_xticklabels(xticklabels);
-    plt.savefig(f"../figures/chained_compilation_{name}times_{group}.pdf", dpi=300, bbox_inches='tight')
+    plt.savefig(f"fig_5_chained_compilation_{name}times_{group}.pdf", dpi=300, bbox_inches='tight')
     plt.close()

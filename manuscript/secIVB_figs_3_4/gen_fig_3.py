@@ -78,4 +78,4 @@ for ax, n in zip(axs, ns):
     print(f"{n=}. At least one converged for all targets: {all(sub_converged.values())}.")
 
 axs[0].set_ylabel("$\\mathcal{L}(\\mathbf{\\theta})$")
-plt.savefig(f"../figures/indep_compilation_cost_{group}.pdf", dpi=300, bbox_inches='tight')
+plt.savefig(f"fig_3_compilation_stats_cost_{group}.pdf", dpi=300, bbox_inches='tight')
