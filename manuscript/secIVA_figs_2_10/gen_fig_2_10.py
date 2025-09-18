@@ -120,6 +120,10 @@ ax.set_ylabel(r"$\mathrm{Expr}$", labelpad=-12)
 ax.set_yticks([1e-1, 1e-3])
 ax.set_yticks([], minor=True)
 
-plt.savefig(f"expressibility_histogram_SU_n_{n}.pdf", dpi=300, bbox_inches="tight")
+if n==3:
+    plt.savefig("fig_2_expressibility_histogram_SU_n_3.pdf", dpi=300, bbox_inches="tight")
+else:
+    plt.savefig(f"fig_10_expressibility_histogram_SU_n_{n}.pdf", dpi=300, bbox_inches="tight")
+
 
 
