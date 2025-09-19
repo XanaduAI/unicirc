@@ -62,4 +62,10 @@ ax.set_ylabel(r"$\kappa$")
 group_label = r"Sp^\ast" if group == "Sp" else group
 ax.text(3, 1., f"${group_label}$", ha="left", va="top")
 ax.legend(loc="upper left", bbox_to_anchor=(1., 1.05))
-plt.savefig(f"{figure_direc}fig_4_compilation_stats_success_rates_{group}.pdf", dpi=300, bbox_inches='tight')
+if group == "SU":
+    fig_no = 3
+if group == "SO":
+    fig_no = 9
+if group == "Sp":
+    fig_no = 10
+plt.savefig(f"{figure_direc}fig_{fig_no}_compilation_stats_success_rates_{group}.pdf", dpi=300, bbox_inches='tight')
