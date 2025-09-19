@@ -355,6 +355,8 @@ def sample_from_group(n, n_samples, group, seed):
         np.ndarray: Batch of randomly sampled matrices from the requested group. The
         returned object has shape ``(n_samples, 2**n, 2**n)``.
 
+    The code for sampling Haar random symplectic unitaries was kindly provided
+    by Maxwell West, https://scholar.google.com/citations?user=Sng5k0AAAAAJ&hl=en
     """
     N = 2**n
     if group == "SU":
