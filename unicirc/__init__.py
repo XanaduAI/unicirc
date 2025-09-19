@@ -13,6 +13,7 @@ from .optimization import (
     make_optimization_run,
     compile_adapt,
     sample_from_group,
+    repeated_optimization,
 )
 from .count_clifford import count_clifford
 from .universality_test import (
