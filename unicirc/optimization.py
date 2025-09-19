@@ -225,8 +225,6 @@ def compile(dim, optimization_run, key=None, tol=1e-10, max_attempts=10):
         key, use_key = jax.random.split(key)
         # 0.2 is a good scaling factor for SU on n<=5 qubits
         theta = jax.random.normal(use_key, shape) * 0.2
-        # theta = jax.random.normal(use_key, shape)
-        # theta = jax.random.uniform(use_key, shape) * (4 * np.pi) - 2 * np.pi
         theta, cost = optimization_run(theta)
         costs.append(cost)
         thetas.append(theta)
@@ -288,6 +286,60 @@ def compile_adapt(
         warnings.warn("Compilation failed.")
     return energies, thetas, num_cz
 
+def random_unit_quaternion():
+    """Generate a random unit quaternion (q0,q1,q2,q3) with q0^2+q1^2+q2^2+q3^2 = 1."""
+    vec = np.random.normal(size=4)
+    vec /= np.linalg.norm(vec)
+    return vec  # [q0, q1, q2, q3]
+
+def generate_random_usp(d):
+    """Generate a Haar-random USp(2d) matrix of size (2d x 2d)."""
+    # Step 1: Random quaternionic d x d matrix with i.i.d. N(0,1) components
+    A = np.random.normal(size=(d, d))
+    B = np.random.normal(size=(d, d))
+    C = np.random.normal(size=(d, d))
+    D = np.random.normal(size=(d, d))
+    # Prepare list to store orthonormal quaternion columns (each as 4 real component arrays)
+    basis = []
+    # Step 2: Quaternionic Gram-Schmidt
+    for j in range(d):
+        # j-th column as quaternion vector components
+        v0, v1, v2, v3 = A[:, j].copy(), B[:, j].copy(), C[:, j].copy(), D[:, j].copy()
+        # Make orthogonal to previous basis vectors
+        for (u0, u1, u2, u3) in basis:
+            # Compute quaternion inner product: q = <u, v> = sum_i conj(u_i)*v_i (a quaternion)
+            p0, p1, p2, p3 = u0, -u1, -u2, -u3      # components of conj(u)
+            q0 = p0 @ v0 - p1 @ v1 - p2 @ v2 - p3 @ v3  # (conj(u)·v)_real
+            q1 = p0 @ v1 + p1 @ v0 + p2 @ v3 - p3 @ v2  # (conj(u)·v)_i
+            q2 = p0 @ v2 - p1 @ v3 + p2 @ v0 + p3 @ v1  # (conj(u)·v)_j
+            q3 = p0 @ v3 + p1 @ v2 - p2 @ v1 + p3 @ v0  # (conj(u)·v)_k
+            # Subtract projection: v := v - u * q
+            t0 = u0 * q0 - u1 * q1 - u2 * q2 - u3 * q3
+            t1 = u0 * q1 + u1 * q0 + u2 * q3 - u3 * q2
+            t2 = u0 * q2 - u1 * q3 + u2 * q0 + u3 * q1
+            t3 = u0 * q3 + u1 * q2 - u2 * q1 + u3 * q0
+            v0 -= t0;  v1 -= t1;  v2 -= t2;  v3 -= t3
+        # Normalize v (so that <v,v> = 1)
+        norm = np.sqrt(v0@v0 + v1@v1 + v2@v2 + v3@v3)
+        v0 /= norm;  v1 /= norm;  v2 /= norm;  v3 /= norm
+        # Step 3: Multiply by a random unit quaternion (random phase)
+        q0, q1, q2, q3 = random_unit_quaternion()
+        t0 = v0*q0 - v1*q1 - v2*q2 - v3*q3
+        t1 = v0*q1 + v1*q0 + v2*q3 - v3*q2
+        t2 = v0*q2 - v1*q3 + v2*q0 + v3*q1
+        t3 = v0*q3 + v1*q2 - v2*q1 + v3*q0
+        v0, v1, v2, v3 = t0, t1, t2, t3
+        basis.append((v0, v1, v2, v3))
+    # Step 4: Assemble the complex 2d x 2d matrix from quaternion basis
+    d2 = 2 * d
+    U = np.zeros((d2, d2), dtype=np.complex128)
+    # Fill block entries for each quaternion column
+    for j, (u0, u1, u2, u3) in enumerate(basis):
+        U[:d, j]      = u0 + 1j*u1         # top-left block
+        U[:d, j+d]    = u2 + 1j*u3         # top-right block
+        U[d:, j]      = -u2 + 1j*u3        # bottom-left block
+        U[d:, j+d]    = u0 - 1j*u1         # bottom-right block
+    return U
 
 def sample_from_group(n, n_samples, group, seed):
     """Randomly sample matrices from a given classical Lie group acting on qubits.
@@ -310,8 +362,12 @@ def sample_from_group(n, n_samples, group, seed):
         if n_samples == 1:
             samples = samples[None]
 
+        dets = np.linalg.det(samples)
+        inv_gphases = dets**(-1/N)
+        samples = samples * dets[:, None, None]
+
     elif group == "O":
-        samples = special_ortho_group.rvs(N, size=n_samples, random_state=seed)
+        samples = ortho_group.rvs(N, size=n_samples, random_state=seed)
         if n_samples == 1:
             samples = samples[None]
 
@@ -319,6 +375,10 @@ def sample_from_group(n, n_samples, group, seed):
         samples = special_ortho_group.rvs(N, size=n_samples, random_state=seed)
         if n_samples == 1:
             samples = samples[None]
+
+    elif group == "Sp":
+        np.random.seed(seed)
+        samples = np.stack([generate_random_usp(N//2) for _ in range(n_samples)])
 
     else:
         raise NotImplementedError
