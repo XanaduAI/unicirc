@@ -1,34 +1,24 @@
+import json
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-MODE = sys.argv[1]
-
-NUM_BATCHES = int(sys.argv[2])
-
+group = sys.argv[1]
+MODE = sys.argv[2]
+NUM_BATCHES = int(sys.argv[3])
 BATCHING = NUM_BATCHES != 1
 
-ns = [3, 4, 5]
-group = "SU"
-tol = 1e-12
+with open("config.json", "r") as config_file:
+    config = json.load(config_file)[group]
 
-n_epochs = {3: 1_000, 4: 5_000, 5: 10_000}
-
-if MODE == "TEST":
-    progress_bar = True
-    n_targets = 2
-    num_attempts = 2
-    direc = "./test_data/"
-
-elif MODE == "PRODUCTION":
-    progress_bar = True
-    n_targets = 10
-    num_attempts = 10
-    direc = "./data/"
-else:
-    raise ValueError
-
+ns = sorted(config["ns"])
+tol = config["tol"]
+n_epochs = {int(n): val for n, val in config["n_epochs"].items()}
+mode_config = config["mode_config"][MODE]
+n_targets = mode_config["n_targets"]
+num_attempts = mode_config["num_attempts"]
+data_direc = mode_config["data_direc"]
+figure_direc = mode_config["figure_direc"]
 
 costs = {}
 for n in ns:
@@ -39,11 +29,11 @@ for n in ns:
         costs[n] = []
         for BATCH_IDX in range(NUM_BATCHES):
             filename_stub = f"{group}_n-{n}_targets-{n_targets}_epochs-{n_epochs_}_tol-{tol}_batch_{BATCH_IDX}_{NUM_BATCHES}"
-            X = np.load(f"{direc}{filename_stub}.npz")
+            X = np.load(f"{data_direc}{filename_stub}.npz")
             costs[n].extend([X[f"target {i}"] for i in range(BATCH_SIZE)])
     else:
         filename_stub = f"{group}_n-{n}_targets-{n_targets}_epochs-{n_epochs_}_tol-{tol}"
-        X = np.load(f"{direc}{filename_stub}.npz")
+        X = np.load(f"{data_direc}{filename_stub}.npz")
         costs[n] = [X[f"target {i}"] for i in range(n_targets)]
 
 plt.rcParams['font.family'] = 'serif'
@@ -70,4 +60,4 @@ ax.set_yticks([0.3, 0.65, 1.])
 ax.set_yticklabels([r"$30\%$", r"$65\%$", r"$100\%$"])
 ax.set_ylabel(r"$\kappa$")
 ax.legend(loc="upper left", bbox_to_anchor=(1., 1.05))
-plt.savefig(f"fig_4_compilation_stats_success_rates_{group}.pdf", dpi=300, bbox_inches='tight')
+plt.savefig(f"{figure_direc}fig_4_compilation_stats_success_rates_{group}.pdf", dpi=300, bbox_inches='tight')
