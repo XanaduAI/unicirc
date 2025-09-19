@@ -1,0 +1,38 @@
+{
+    "SU": {
+        "ns": [5, 4, 3],
+        "n_epochs": {"3": 1000, "4": 5000, "5": 10000},
+        "tol": 1e-10,
+        "num_records": {"3": 1000, "4": 2500, "5": 5000},
+        "max_const": {"3": 100, "4": 100, "5": 100},
+        "mode_config": {
+            "TEST": {"n_targets": {"3": 2, "4": 2, "5": 2}, "max_attempts": 10, "data_direc": "./test/data/", "figure_direc": "./test/figures/"},
+            "PRODUCTION": {"n_targets": {"3": 1000, "4": 500, "5": 100}, "max_attempts": 20, "data_direc": "./data/", "figure_direc": "./figures/"}
+        },
+        "seed": 2152
+    },
+    "SO": {
+        "ns": [5, 4, 3],
+        "n_epochs": {"3": 1000, "4": 5000, "5": 10000},
+        "num_records": {"3": 1000, "4": 2500, "5": 5000},
+        "max_const": {"3": 100, "4": 100, "5": 100},
+        "tol": 1e-10,
+        "mode_config": {
+            "TEST": {"n_targets": {"3": 2, "4": 2, "5": 2}, "max_attempts": 10, "data_direc": "./test/data/", "figure_direc": "./test/figures/"},
+            "PRODUCTION": {"n_targets": {"3": 1000, "4": 500, "5": 100}, "max_attempts": 20, "data_direc": "./data/", "figure_direc": "./figures/"}
+        },
+        "seed": 2152
+    },
+    "Sp": {
+        "ns": [5, 4, 3],
+        "n_epochs": {"3": 1000, "4": 5000, "5": 10000},
+        "num_records": {"3": 1000, "4": 2500, "5": 5000},
+        "max_const": {"3": 100, "4": 100, "5": 100},
+        "tol": 1e-10,
+        "mode_config": {
+            "TEST": {"n_targets": {"3": 2, "4": 2, "5": 2}, "max_attempts": 10, "data_direc": "./test/data/", "figure_direc": "./test/figures/"},
+            "PRODUCTION": {"n_targets": {"3": 1000, "4": 500, "5": 100}, "max_attempts": 20, "data_direc": "./data/", "figure_direc": "./figures/"}
+        },
+        "seed": 2152
+    }
+}
