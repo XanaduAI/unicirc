@@ -44,6 +44,7 @@ cm = plt.get_cmap('turbo')
 
 fig, axs = plt.subplots(1, 3, figsize=(9, 3), sharey=True, gridspec_kw={"wspace": 0.1})
 
+group_label = r"Sp^\ast" if group == "Sp" else group
 for ax, n in zip(axs, ns):
     num_runs = n_targets * num_attempts
     n_epochs_ = n_epochs[n]
@@ -59,7 +60,7 @@ for ax, n in zip(axs, ns):
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel("Epochs")
-    ax.set_title(f"${n=}$")
+    ax.set_title(f"${n=}, {group_label}({2**n})$")
     ax.text(0.05, 0.3, f"$\\kappa={converged/num_runs*100:.1f}\\%$", transform=ax.transAxes)
     xlim = (ax.get_xlim()[0], n_epochs_)
     ax.plot(xlim, [1e-10]*2, color="k", ls=":", zorder=-10)

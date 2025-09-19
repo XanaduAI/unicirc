@@ -59,5 +59,7 @@ ax.set_xticks(ns)
 ax.set_yticks([0.3, 0.65, 1.])
 ax.set_yticklabels([r"$30\%$", r"$65\%$", r"$100\%$"])
 ax.set_ylabel(r"$\kappa$")
+group_label = r"Sp^\ast" if group == "Sp" else group
+ax.text(3, 1., f"${group_label}$", ha="left", va="top")
 ax.legend(loc="upper left", bbox_to_anchor=(1., 1.05))
 plt.savefig(f"{figure_direc}fig_4_compilation_stats_success_rates_{group}.pdf", dpi=300, bbox_inches='tight')
