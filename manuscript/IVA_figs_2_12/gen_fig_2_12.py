@@ -123,7 +123,7 @@ ax.set_yticks([], minor=True)
 if n==3:
     plt.savefig("figures/fig_2_expressibility_histogram_SU_n_3.pdf", dpi=300, bbox_inches="tight")
 else:
-    plt.savefig(f"figures/fig_10_expressibility_histogram_SU_n_{n}.pdf", dpi=300, bbox_inches="tight")
+    plt.savefig(f"figures/fig_12_expressibility_histogram_SU_n_{n}.pdf", dpi=300, bbox_inches="tight")
 
 
 
