@@ -46,7 +46,7 @@ for run_i, (n, n_epochs, shuffle_) in enumerate(zip([3, 4, 4, 4], [20_000, 20_00
         U = jnp.eye(2**n, dtype=complex)
         for ll, P in enumerate(sun_m):
             U = (jnp.cos(params[ll]) * id_m - 1j * jnp.sin(params[ll]) * P) @ U
-        
+
         return U
 
     jac_mat_fn = jax.jacobian(ansatz_func, argnums=0, holomorphic=True)
@@ -65,7 +65,7 @@ for run_i, (n, n_epochs, shuffle_) in enumerate(zip([3, 4, 4, 4], [20_000, 20_00
     def cost(params, u_target):
         U = ansatz_func(params)
         return 1 - jnp.abs(jnp.trace(u_target.conj().T @ U))/(2**n)
-    
+
     value_and_grad = jax.jit(jax.value_and_grad(cost, argnums=0))
 
     n_params = dim
@@ -99,12 +99,12 @@ for run_i, (n, n_epochs, shuffle_) in enumerate(zip([3, 4, 4, 4], [20_000, 20_00
 
                     energy.append(val)
                     thetas.append(theta)
-                
+
                 energys.append(energy)
                 pick = np.argmin(energy) - 1 # take only the best theta
                 thetass.append(thetas[pick])
                 print(f"Total time elapsed: {datetime.now() - t0} with min energy {np.min(energy)}")
-            
+
             energyss.append(energys)
             thetasss.append(thetass)
             results = {"energy": energyss, "thetas": thetasss} # dummy initialize
@@ -118,7 +118,7 @@ for run_i, (n, n_epochs, shuffle_) in enumerate(zip([3, 4, 4, 4], [20_000, 20_00
     t1 = datetime.now()
 
     print(f"total time: {t1 - t0}")
-    
+
     jax.clear_caches()
 
 # import os
