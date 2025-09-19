@@ -1,5 +1,4 @@
-import concurrent
-from multiprocessing import Pool
+import json
 import sys
 from unicirc import matrix_v2, make_cost_fn, make_optimization_run, compile, ansatz_specs, sample_from_group
 import jax
@@ -14,34 +13,27 @@ from tqdm.auto import tqdm
 import time
 import optax
 
-MODE = sys.argv[1]
-NUM_BATCHES = int(sys.argv[2])
-BATCH_IDX = int(sys.argv[3])
+group = sys.argv[1]
+MODE = sys.argv[2]
+NUM_BATCHES = int(sys.argv[3])
+BATCH_IDX = int(sys.argv[4])
+BATCHING = NUM_BATCHES != 1
 assert 0 <= BATCH_IDX <= NUM_BATCHES-1
 
-BATCHING = NUM_BATCHES != 1
+with open("config.json", "r") as config_file:
+    config = json.load(config_file)[group]
 
-ns = [3, 4, 5]
-group = "SU"
-tol = 1e-10
-n_epochs = {3: 1_000, 4: 5_000, 5: 10_000}
-num_records = {n: max((1_000, epochs//2)) for n, epochs in n_epochs.items()}
-max_const = {3: 100, 4: 100, 5: 100}
-
-if MODE == "TEST":
-    progress_bar = True
-    n_targets = {3: 2, 4: 2, 5: 2}
-    max_attempts = 10
-    direc = "./test_data/"
-elif MODE == "PRODUCTION":
-    progress_bar = True
-    n_targets = {3: 1_000, 4: 500, 5: 100}
-    max_attempts = 20
-    direc = "./data/"
-else:
-    raise ValueError
-
-seed = 2152
+ns = config["ns"]
+n_epochs = {int(n): val for n, val in config["n_epochs"].items()}
+num_records = {int(n): val for n, val in config["num_records"].items()}
+max_const = {int(n): val for n, val in config["max_const"].items()}
+tol = config["tol"]
+seed = config["seed"]
+mode_config = config["mode_config"][MODE]
+n_targets = {int(n): val for n, val in mode_config["n_targets"].items()}
+max_attempts = mode_config["max_attempts"]
+direc = mode_config["data_direc"]
+progress_bar = True
 
 data = {"wall_times": {}, "cpu_times": {}, "costs": {}, "theta_opt": {}, "success": {}}
 for n in ns:

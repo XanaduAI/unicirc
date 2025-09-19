@@ -1,31 +1,28 @@
+import json
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-MODE = sys.argv[1]
-NUM_BATCHES = int(sys.argv[2])
-
+group = sys.argv[1]
+MODE = sys.argv[2]
+NUM_BATCHES = int(sys.argv[3])
 BATCHING = NUM_BATCHES != 1
 
+with open("config.json", "r") as config_file:
+    config = json.load(config_file)[group]
+
+ns = sorted(config["ns"])
+n_epochs = {int(n): val for n, val in config["n_epochs"].items()}
+tol = config["tol"]
+seed = config["seed"]
+mode_config = config["mode_config"][MODE]
+n_targets = {int(n): val for n, val in mode_config["n_targets"].items()}
+data_direc = mode_config["data_direc"]
+figure_direc = mode_config["figure_direc"]
 
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.size'] = 16
 plt.rcParams['text.usetex'] = True
-
-ns = [3, 4, 5]
-group = "SU"
-tol = 1e-10
-n_epochs = {3: 1_000, 4: 5_000, 5: 10_000}
-
-if MODE == "TEST":
-    n_targets = {3: 2, 4: 2, 5: 2}
-    direc = "./test_data/"
-elif MODE == "PRODUCTION":
-    n_targets = {3: 1_000, 4: 500, 5: 100}
-    direc = "./data/"
-else:
-    raise ValueError
-
 
 costs = {}
 
@@ -37,11 +34,11 @@ for n in ns:
         costs[n] = []
         for BATCH_IDX in range(NUM_BATCHES):
             filename_stub = f"{group}_n-{n}_targets-{n_targets_}_epochs-{n_epochs_}_tol-{tol}_batch_{BATCH_IDX}_{NUM_BATCHES}"
-            X = np.load(f"{direc}cost_{filename_stub}.npz")
+            X = np.load(f"{data_direc}cost_{filename_stub}.npz")
             costs[n].extend([X[f"target {i}"] for i in range(BATCH_SIZE)])
     else:
         filename_stub = f"{group}_n-{n}_targets-{n_targets_}_epochs-{n_epochs_}_tol-{tol}"
-        X = np.load(f"{direc}cost_{filename_stub}.npz")
+        X = np.load(f"{data_direc}cost_{filename_stub}.npz")
         costs[n] = [X[f"target {i}"] for i in range(n_targets_)]
 
 
@@ -58,7 +55,10 @@ x_ticks_first_panel = {
     5: [10**0, 10**2, 10**4],
 }
 
-for axs, n, n_epochs_, n_targets_ in zip(axss, ns, n_epochs, n_targets):
+for axs, n in zip(axss, ns, strict=True):
+    n_epochs_ = n_epochs[n]
+    n_targets_ = n_targets[n]
+
     colors = [cm(i/n_targets_) for i in range(n_targets_)]
 
     converged = np.zeros(len(axs),dtype=int)
@@ -96,4 +96,4 @@ for axs, n, n_epochs_, n_targets_ in zip(axss, ns, n_epochs, n_targets):
             ax.set_xticks(x_ticks_first_panel[n])
             ax.set_ylabel(f"$\\mathcal{{L}}(\\theta)$")
             ax.text(1.5, tol**(1/2), f"${n=}$")
-plt.savefig(f"fig_6_chained_compilation_cost_{group}.pdf", dpi=300, bbox_inches='tight')
+plt.savefig(f"{figure_direc}fig_6_chained_compilation_cost_{group}.pdf", dpi=300, bbox_inches='tight')
