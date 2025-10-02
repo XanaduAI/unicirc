@@ -57,7 +57,8 @@ for ax in axs[:, 1]:
     ax.yaxis.set_label_position("right")
     ax.yaxis.tick_right()
 
-panel_labels = ["a)", "b)", "c)"]
+panel_labels = ["a)", "b)", "c)", "d)"]
+panel_labels = [f"\\textbf{{{lab}}}" for lab in panel_labels]
 
 for i, (num_samples, color, ax) in enumerate(zip(plot_reg_samples, colors, axs[:, :2].flat)):
     counts, F, _ = ax.hist(fidelities_reg_many[num_samples], bins=num_bins, range=(0, 1), color=color, alpha=0.0, density=True)
@@ -111,7 +112,7 @@ ax.plot(
     # zorder=-10,
 )
 ax.legend()
-ax.text(0.05, 0.1, "d)", transform=ax.transAxes, ha="left")
+ax.text(0.05, 0.1, panel_labels[3], transform=ax.transAxes, ha="left")
 
 ax.set_xscale("log")
 ax.set_yscale("log")
