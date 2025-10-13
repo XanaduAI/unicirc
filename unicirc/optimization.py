@@ -169,7 +169,7 @@ def make_optimization_run(cost_fn, optimizer):
             tuple[jnp.ndarray]: Optimized parameters and recording of ``num_records`` steps
             and the attained cost values at those steps.
         """
-        if max_const is None:
+        if max_const in (None, 0):
             # Never interrupt
             max_const = 10 * n_epochs
         if num_records is None:
@@ -285,7 +285,7 @@ def compile_adapt(
             tol=tol,
             max_attempts=max_attempts_per_num_cz,
         )
-        if np.min(energies) <= adapt_tol:
+        if np.min(np.array(energies)[:, :, 1]) <= adapt_tol:
             break
     else:
         warnings.warn("Compilation failed.")
