@@ -169,6 +169,9 @@ def make_optimization_run(cost_fn, optimizer):
             tuple[jnp.ndarray]: Optimized parameters and recording of ``num_records`` steps
             and the attained cost values at those steps.
         """
+        if max_const is None:
+            # Never interrupt
+            max_const = 10 * n_epochs
         if num_records is None:
             num_records = n_epochs
         init_params = init_params.copy()
@@ -241,14 +244,16 @@ def compile_adapt(
     n_epochs,
     num_czs=None,
     max_attempts_per_num_cz=1,
-    tol=1e-10,
-    max_const=0,
+    optimization_tol=1e-10,
+    adapt_tol=1e-10,
+    max_const=None,
     progress_bar=False,
     num_records=500,
     seed=None,
 ):
     N = len(target)
     n = int(np.round(np.log2(N)))
+    assert adapt_tol is not None
 
     dim, params_init, params_per_cz, univ_num_cz, _ = ansatz_specs(n, group)
     if num_czs is None:
@@ -261,26 +266,26 @@ def compile_adapt(
         cost_fn = make_cost_fn(matrix_fn)
         run_optimization = make_optimization_run(cost_fn, optimizer)
 
-        opt_run = jax.jit(
+        opt_run = partial(jax.jit(
             partial(
                 run_optimization,
                 n_epochs=n_epochs,
-                tol=tol,
+                tol=optimization_tol,
                 max_const=max_const,
                 progress_bar=progress_bar,
                 num_records=num_records,
             )
-        )
+        ), target_dag=target_dag)
         num_params = min((params_init + params_per_cz * num_cz, dim))
 
         energies, thetas, successful = compile(
             num_params,
-            partial(opt_run, target_dag=target_dag),
+            opt_run,
             key=seed,
-            tol=tol,
+            tol=optimization_tol,
             max_attempts=max_attempts_per_num_cz,
         )
-        if successful:
+        if np.min(energies) <= adapt_tol:
             break
     else:
         warnings.warn("Compilation failed.")
