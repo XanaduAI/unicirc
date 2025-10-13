@@ -244,7 +244,7 @@ def compile_adapt(
     n_epochs,
     num_czs=None,
     max_attempts_per_num_cz=1,
-    optimization_tol=1e-10,
+    tol=1e-10,
     adapt_tol=1e-10,
     max_const=None,
     progress_bar=False,
@@ -270,7 +270,7 @@ def compile_adapt(
             partial(
                 run_optimization,
                 n_epochs=n_epochs,
-                tol=optimization_tol,
+                tol=tol,
                 max_const=max_const,
                 progress_bar=progress_bar,
                 num_records=num_records,
@@ -282,7 +282,7 @@ def compile_adapt(
             num_params,
             opt_run,
             key=seed,
-            tol=optimization_tol,
+            tol=tol,
             max_attempts=max_attempts_per_num_cz,
         )
         if np.min(energies) <= adapt_tol:
