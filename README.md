@@ -9,6 +9,7 @@ brick wall circuits" is enclosed as well.
 
 The repository is structured as follows:
 
+- `example_script.py` provides an example usage of the most important function: `unicirc.compile`.
 - `manuscript/` contains all scripts, data and figures for the preprint. The subdirs are arranged by sections and figures
 - `pyproject.toml` defines the Python package `unicirc`
 - `unicirc/` contains the source code for the Python package `unicirc`
