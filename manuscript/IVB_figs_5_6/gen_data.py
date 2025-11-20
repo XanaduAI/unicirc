@@ -1,3 +1,18 @@
+"""This file generates the data for Sec. IVB (Fig. 5& 6) 
+for compilation of random matrices into brickwall circuits.
+Call it with
+
+python gen_data.py GROUP MODE NUM_BATCHES BATCH_IDX
+
+where 
+- GROUP is one of SU, SO, Sp,
+- MODE is TEST or PRODUCTION, leading to a small test data set or the full
+  experiment data being produced.
+- NUM_BATCHES is the number of batches the runs should be divided into.
+- BATCH_IDX is the index of the batch to be run (must be < NUM_BATCHES)
+
+If you prefer not to batch, just use NUM_BATCHES=1 and BATCH_IDX=0.
+"""
 import json
 import sys
 from unicirc import matrix_v2, make_cost_fn, make_optimization_run, compile, ansatz_specs, sample_from_group

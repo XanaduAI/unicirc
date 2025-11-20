@@ -1,3 +1,18 @@
+"""This file generates the data for Sec. IVB (Fig. 3) and Apps. A & B 
+for compilation of random matrices into brickwall circuits.
+Call it with
+
+python gen_data.py GROUP MODE NUM_BATCHES BATCH_IDX
+
+where 
+- GROUP is one of SU, SO, Sp,
+- MODE is TEST or PRODUCTION, leading to a small test data set or the full
+  experiment data being produced.
+- NUM_BATCHES is the number of batches the runs should be divided into.
+- BATCH_IDX is the index of the batch to be run (must be < NUM_BATCHES)
+
+If you prefer not to batch, just use NUM_BATCHES=1 and BATCH_IDX=0.
+"""
 import sys
 import json
 import jax
@@ -7,7 +22,7 @@ import optax
 from functools import partial
 from tqdm.auto import tqdm
 
-group = sys.argv[1]
+GROUP = sys.argv[1]
 MODE = sys.argv[2]
 NUM_BATCHES = int(sys.argv[3])
 BATCH_IDX = int(sys.argv[4])
@@ -15,7 +30,7 @@ BATCHING = NUM_BATCHES != 1
 assert 0 <= BATCH_IDX <= NUM_BATCHES-1
 
 with open("config.json", "r") as config_file:
-    config = json.load(config_file)[group]
+    config = json.load(config_file)[GROUP]
 
 ns = config["ns"]
 n_epochs = {int(n): val for n, val in config["n_epochs"].items()}
@@ -40,16 +55,16 @@ for n in ns:
     epochs_per_record = n_epochs_ // num_records_
     max_const_ = max((2, max_const[n] // epochs_per_record))
 
-    d, *_ = ansatz_specs(n, group)
+    d, *_ = ansatz_specs(n, GROUP)
     optimizer = optax.lbfgs(learning_rate=None, memory_size=5 * d)
-    targets = sample_from_group(n, n_targets, group, seed)
+    targets = sample_from_group(n, n_targets, GROUP, seed)
 
     if BATCHING:
         assert (n_targets % NUM_BATCHES) == 0
         BATCH_SIZE = n_targets // NUM_BATCHES
         targets = targets[BATCH_SIZE * BATCH_IDX: BATCH_SIZE * (BATCH_IDX + 1)]
 
-    matrix_fn = matrix_v2(n, group)
+    matrix_fn = matrix_v2(n, GROUP)
     cost_fn = make_cost_fn(matrix_fn)
     run_optimization = make_optimization_run(cost_fn, optimizer)
 
@@ -65,9 +80,9 @@ for n in ns:
     )
 
     if BATCHING:
-        filename_stub = f"{group}_n-{n}_targets-{n_targets}_epochs-{n_epochs_}_tol-{tol}_batch_{BATCH_IDX}_{NUM_BATCHES}"
+        filename_stub = f"{GROUP}_n-{n}_targets-{n_targets}_epochs-{n_epochs_}_tol-{tol}_batch_{BATCH_IDX}_{NUM_BATCHES}"
     else:
-        filename_stub = f"{group}_n-{n}_targets-{n_targets}_epochs-{n_epochs_}_tol-{tol}"
+        filename_stub = f"{GROUP}_n-{n}_targets-{n_targets}_epochs-{n_epochs_}_tol-{tol}"
 
     for target_idx, target in tqdm(enumerate(targets), total=len(targets)):
         print(f"{target_idx} / {len(targets)}")

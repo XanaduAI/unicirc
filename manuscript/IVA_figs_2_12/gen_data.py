@@ -1,7 +1,7 @@
 """This file generates the data for Sec. IVA and App. F on the expressibility measure
 by Sim et al. Call it with
 
-python IVA_expressibility_gen_data.py NUM
+python gen_data.py NUM
 
 where NUM is the number of qubits `n` that you would like to run the test for.
 Afterwards, the figures can be produced with IVA_expressibility_plot.py.

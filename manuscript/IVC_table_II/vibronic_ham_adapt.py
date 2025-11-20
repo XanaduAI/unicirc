@@ -54,5 +54,5 @@ for jjj, U in enumerate(Us):
     np.savez(results_name + ".npz", **results)
 
 
-import os
-os.system('sudo shutdown now')
+#import os
+#os.system('sudo shutdown now')
