@@ -4,8 +4,8 @@ Here we present a small Python package defining quantum circuits with a brick wa
 providing numerical tools to check necessary conditions for their universality, and implementing
 variational optimization workflows to compile typical unitaries to them.
 
-The code used to produce the data and figures in the preprint "Unitary synthesis with optimal
-brick wall circuits" is enclosed as well.
+The code used to produce the data and figures in the preprint ["Unitary synthesis with optimal
+brick wall circuits" (arXiv:2511.16736)](https://arxiv.org/abs/2511.16736) is enclosed as well.
 
 The repository is structured as follows:
 
